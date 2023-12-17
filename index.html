@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IMD232 FINAL 최수빈 202220389</title>
+    <link
+      href="//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSansNeo.css"
+      rel="stylesheet"
+      type="text/css" />
+    <!-- <link rel="stylesheet" href="./style.css" /> -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+    <script src="./p5Util.js" defer></script>
+    <style>
+      body {
+        margin: 150;
+        padding: 30;
+        background-color: rgb(0, 0, 0);
+        color: rgb(255, 234, 0);
+      }
+      #canvas {
+        color: rgb(255, 234, 0);
+        position: absolute;
+        top: 45px;
+        left: 790px;
+      }
+      #canvas video {
+        position: absolute;
+        top: 10px;
+        left: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="viewport">
+      <header>
+        <section>
+          <div class="container">
+            <h1>WHAT DOES YOUR UNIVERSE LOOK LIKE ?</h1>
+          </div>
+
+          <div id="canvas" onclick="changeBackgroundColor()">
+            Change Dimension
+          </div>
+        </section>
+      </header>
+    </div>
+
+    <script>
+      let video;
+      let asciiDiv;
+      const density = ' ✪★✮✯✬✩✰*⭑⭒~-,._';
+
+      function setup() {
+        const canvas = createCanvas(0, 0); // 캔버스 크기 조정
+        canvas.parent('canvas'); // 캔버스를 'canvas' id를 가진 div에 부모 요소로 연결
+
+        video = createCapture(VIDEO); // 비디오 캡처 생성
+        video.size(70, 70); // 비디오 크기 조정
+        video.hide(); // 비디오 숨기기
+
+        const canvasDiv = select('#canvas'); // 'canvas' id를 가진 div 선택
+        video.parent(canvasDiv); // 비디오를 'canvas' id를 가진 div의 자식 요소로 추가
+
+        asciiDiv = createDiv(); // HTML 출력을 위한 div 요소 생성
+      }
+
+      function draw() {
+        background(0);
+
+        video.loadPixels();
+        const asciiImage = [];
+        for (let y = 0; y < video.height; y += 2) {
+          let row = '';
+          for (let x = 0; x < video.width; x++) {
+            const pixelIndex = (x + y * video.width) * 4;
+            const r = video.pixels[pixelIndex];
+            const g = video.pixels[pixelIndex + 1];
+            const b = video.pixels[pixelIndex + 2];
+            const avg = (r + g + b) / 3;
+            const charIndex = floor(map(avg, 0, 255, 0, density.length));
+
+            const c = density.charAt(charIndex);
+            row += c === '' ? '&nbsp;' : c;
+          }
+          asciiImage.push(row);
+        }
+
+        // ASCII 아트를 HTML 요소에 추가
+        asciiDiv.html(asciiImage.join('<br>'));
+      }
+
+      // 배경색 변경 함수
+      function changeBackgroundColor() {
+        const randomColor = getRandomColor();
+        document.body.style.backgroundColor = randomColor;
+      }
+
+      // 랜덤 색상 생성 함수
+      function getRandomColor() {
+        return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+      }
+    </script>
+  </body>
+</html>
